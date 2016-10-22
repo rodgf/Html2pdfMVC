@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25123.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Html2pdfMVC", "Html2pdfMVC\Html2pdfMVC.csproj", "{FAAD7D8A-EB62-49A5-9DB2-6045E3FE77BE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FAAD7D8A-EB62-49A5-9DB2-6045E3FE77BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FAAD7D8A-EB62-49A5-9DB2-6045E3FE77BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FAAD7D8A-EB62-49A5-9DB2-6045E3FE77BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FAAD7D8A-EB62-49A5-9DB2-6045E3FE77BE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
