@@ -27,3 +27,5 @@ A view em questão será a própria view usada para gerar o PDF, não é necess�
 [iTextXmlWorker docs] ( http://demo.itextsupport.com/xmlworker/itextdoc/flatsite.html )
 
 [Demo] ( http://demo.itextsupport.com/xmlworker/ )
+
+[CSS suportados] ( http://demo.itextsupport.com/xmlworker/itextdoc/CSS-conformance-list.htm )
