@@ -12,6 +12,11 @@ namespace Html2pdfMVC.Controllers {
       return View(modelo);
     }
 
+    // Erro
+    public ActionResult Erro() {
+      return View();
+    }
+
     // Gera PDF a partir da view
     [HttpPost]
     public ActionResult gerarPDF() {

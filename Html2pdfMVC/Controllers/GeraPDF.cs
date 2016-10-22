@@ -58,7 +58,9 @@ namespace Html2pdfMVC.Controllers {
         // Arquivo para download
         if (Download != null)
           cc.HttpContext.Response.AddHeader("content-disposition", "attachment; filename=" + Download);
-        (new FileContentResult(GeraDocumento(cc), "application/pdf")).ExecuteResult(cc);
+        byte[] buff = GeraDocumento(cc);
+        if (buff != null)
+          (new FileContentResult(buff, "application/pdf")).ExecuteResult(cc);
       }
     }
 
@@ -84,6 +86,13 @@ namespace Html2pdfMVC.Controllers {
             try {
               XMLWorkerHelper.GetInstance().ParseXHtml(pw, doc, sr);
             } catch (Exception ee) {
+              cc.HttpContext.Session["Erro"] = ee;
+              try {
+                doc.Dispose();
+              } catch (Exception) { }
+              cc.Controller.TempData["Erro"] = ee;
+              NomeView = "Erro";
+              RenderizaHtml(cc);
               return null;
             }
 
