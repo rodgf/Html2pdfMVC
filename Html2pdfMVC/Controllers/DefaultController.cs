@@ -1,4 +1,5 @@
-﻿using System;
+﻿using iTextSharp.text;
+using System;
 using System.Web.Mvc;
 
 namespace Html2pdfMVC.Controllers {
@@ -6,10 +7,36 @@ namespace Html2pdfMVC.Controllers {
 
     // GET: Default
     public ActionResult Index() {
-      int inID = (new Random()).Next(100);
+      object modelo = (new Random()).Next(100);
 
-      ViewData["ID"] = inID;
-      return View();
+      return View(modelo);
+    }
+
+    // Gera PDF a partir da view
+    [HttpPost]
+    public ActionResult gerarPDF() {
+      object modelo = 0;
+
+      if (Request.Form["id"] != null)
+        modelo = int.Parse(Request.Form["id"].ToString());
+
+      return new GeraPDF("Index", modelo);
+    }
+
+    // Gera PDF com alterações
+    [HttpPost]
+    public ActionResult geraPDFAlt() {
+      object modelo = 0;
+
+      if (Request.Form["id"] != null)
+        modelo = int.Parse(Request.Form["id"].ToString());
+
+      return new GeraPDF(modelo, (writer, document) => {
+        document.SetPageSize(new Rectangle(500f, 500f, 90));
+        document.NewPage();
+      }) {
+        Download = "Saida.pdf"
+      };
     }
   }
 }

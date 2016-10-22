@@ -2,7 +2,7 @@
   ViewBag.Title = "Index";
 }
 
-<h2>Relatório XPTO - Registro @Html.Raw(ViewData["ID"])</h2>
+<h2>Relatório XPTO - Registro @Html.Raw((int)Model)</h2>
 
 <!-- Tabela 1 -->
 <form id="form1" name="form1">
@@ -130,10 +130,10 @@
   </table>
 </div>
 
-<div class="ajeita excluir">
-  <form id="frmPDF" action="gerarPDF">
+@using (Html.BeginForm("GerarPDF", "Default", FormMethod.Post, new { id = "frmPDF" })) {
+  <div class="ajeita excluir">
     <input type="hidden" id="txRel" name="rel" value="Tabelas XPTO" />
-    <input type="hidden" id="txID" name="id" value="@ViewData["ID"]" />
+    <input type="hidden" id="txID" name="id" value="@Html.Raw((int)Model)" />
     <input type="submit" value="Gerar PDF" />
-  </form>
-</div>
+  </div>
+}
