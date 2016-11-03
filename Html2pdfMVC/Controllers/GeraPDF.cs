@@ -97,7 +97,7 @@ namespace Html2pdfMVC.Controllers {
               // Versão VahidN (ver classe abaixo)
               var tagProcessors = (DefaultTagProcessorFactory)Tags.GetHtmlTagProcessorFactory();
               tagProcessors.RemoveProcessor(HTML.Tag.IMG); // remove the default processor
-              tagProcessors.AddProcessor(HTML.Tag.IMG, new CustomImageTagProcessor()); // use our new processor
+              tagProcessors.AddProcessor(HTML.Tag.IMG, new CustomImageTagProcessor());              // use our new processor
 
               CssFilesImpl cssFiles = new CssFilesImpl();
               cssFiles.Add(XMLWorkerHelper.GetInstance().GetDefaultCSS());

@@ -1,6 +1,9 @@
-﻿using iTextSharp.text;
-using System;
+﻿using System;
 using System.Web.Mvc;
+
+using iTextSharp.text;
+
+using Html2pdfMVC.Models;
 
 namespace Html2pdfMVC.Controllers {
   public class DefaultController : Controller {
@@ -19,7 +22,10 @@ namespace Html2pdfMVC.Controllers {
 
     // HTML com imagem
     public ActionResult ComImagem() {
-      object modelo = (new Random()).Next(100);
+      string stImagem = Server.MapPath("/images/CEASA.jpg");
+      PDFComImagem modelo = new PDFComImagem();
+      modelo.Imagens.Add("Img1", img2base64(stImagem));
+      modelo.ID = (new Random()).Next(100);
 
       return View(modelo);
     }
@@ -38,10 +44,11 @@ namespace Html2pdfMVC.Controllers {
     // Gera PDF com imagem a partir da view
     [HttpPost]
     public ActionResult gerarPDFImagem() {
-      object modelo = 0;
-
+      string stImagem = Server.MapPath("/images/CEASA.jpg");
+      PDFComImagem modelo = new PDFComImagem();
+      modelo.Imagens.Add("Img1", img2base64(stImagem));
       if (Request.Form["id"] != null)
-        modelo = int.Parse(Request.Form["id"].ToString());
+        modelo.ID = int.Parse(Request.Form["id"].ToString());
 
       return new GeraPDF("ComImagem", modelo, (writer, document) => {
         document.SetPageSize(new Rectangle(850f, 600f, 90));
@@ -62,6 +69,19 @@ namespace Html2pdfMVC.Controllers {
       }) {
         Download = "Saida.pdf"
       };
+    }
+
+    // Converte arquivo para base64
+    string img2base64(string arquivo) {
+      string stResult = "";
+
+      try {
+        Byte[] bytes = System.IO.File.ReadAllBytes(arquivo);
+        stResult = Convert.ToBase64String(bytes);
+      } catch (Exception ee) {
+        System.Diagnostics.Debug.WriteLine("Falha ao converter arquivo para base64 (" + ee + ").");
+      }
+      return stResult;
     }
   }
 }

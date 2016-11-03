@@ -5,18 +5,20 @@ Este projeto foi inspirado no projeto MvcRazorToPdf de Andrew Hutchinson ( [http
 
 Converte uma página razor/html para pdf no navegador usando iText XML Worker (iTextXmlWorker), disponibilizado nas últimas versões da bibliotexa iText/iTextSarp.
 
-É interessante notar que nem todas as tags html e folhas estilos são processadas. Particularmente, os CSS importados não são processados.
-
-O html, por outro lado, deve ser composto como um XML válido, ou seja, todas as tags fechadas, etc.
+O html deve ser composto como um XML válido, ou seja, todas as tags fechadas, etc.
 
 **Utilização em um projeto existente:**
 
 - Acrescente as bibliotecas itextsharp e itextsharp.xmlworker ao seu projeto;
-- Inclua a classe GeraPDF.cs no projeto
-- Faça a chamada a partir da Controller no formato 'return new GeraPDF("NomeDaView", modelo);' - a classe estende ActionResult e despeja o PDF na saída do contexto http
-- Outras modificações são permitidas, inclusive download direto do PDF (veja exemplo no próprio código do projeto)
+- Inclua a classe GeraPDF.cs no projeto;
+- Faça a chamada a partir da Controller no formato 'return new GeraPDF("NomeDaView", modelo);' - a classe estende ActionResult e despeja o PDF na saída do contexto http;
+- Outras modificações são permitidas, inclusive download direto do PDF (veja exemplo no próprio código do projeto).
 
 A view em questão será a própria view usada para gerar o PDF, não é necessário criar outra view. Você pode incluir um botão na mesma view fazendo a chamada à ação que gerará o PDF.
+
+**HTML com imagens**
+
+Graças ao artigo de VahidN em [StackOverflow](http://stackoverflow.com/questions/19389999/can-itextsharp-xmlworker-render-embedded-images) é possível incluirem-se imagens no PDF a partir de tags <img> usando conversão para base64. Veja exemplo no projeto.
 
 **Projeto de exemplo**
 
@@ -29,3 +31,5 @@ A view em questão será a própria view usada para gerar o PDF, não é necess�
 [Demo] ( http://demo.itextsupport.com/xmlworker/ )
 
 [CSS suportados] ( http://demo.itextsupport.com/xmlworker/itextdoc/CSS-conformance-list.htm )
+
+[Can itextsharp.xmlworker render embedded images?] ( http://stackoverflow.com/questions/19389999/can-itextsharp-xmlworker-render-embedded-images )
