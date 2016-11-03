@@ -1,7 +1,7 @@
 # Html2pdfMVC
 Gera PDF a partir de página HTML Razor
 
-Este projeto foi inspirado no projeto MvcRazorToPdf de Andrew Hutchinson ( [https://github.com/andyhutch77/MvcRazorToPdf] ), como uma simplificação e acrescentando tratamento de erros.
+Este projeto foi inspirado no projeto MvcRazorToPdf de [Andrew Hutchinson](https://github.com/andyhutch77/MvcRazorToPdf), como uma simplificação e acrescentando tratamento de erros.
 
 Converte uma página razor/html para pdf no navegador usando iText XML Worker (iTextXmlWorker), disponibilizado nas últimas versões da bibliotexa iText/iTextSarp.
 
