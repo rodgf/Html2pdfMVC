@@ -130,10 +130,11 @@
   </table>
 </div>
 
-@using (Html.BeginForm("GerarPDF", "Default", FormMethod.Post, new { id = "frmPDF" })) {
+@using (Html.BeginForm("GerarPDF", "Default", FormMethod.Post, new { id = "frmPDF", target = "_blank" })) {
   <div class="ajeita excluir">
     <input type="hidden" id="txRel" name="rel" value="Tabelas XPTO" />
     <input type="hidden" id="txID" name="id" value="@Html.Raw((int)Model)" />
-    <input type="submit" value="Gerar PDF" />
+    <input type="submit" value="Gerar PDF" style="width: 150px" />&nbsp;
+    <input type="button" value="HTML com imagem" onclick="document.location.href='@Url.Content("~/Default/ComImagem")'" style="width: 150px" />
   </div>
 }

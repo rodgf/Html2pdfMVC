@@ -2,13 +2,20 @@
 using System.IO;
 using System.Text;
 using System.Web.Mvc;
+using System.Collections.Generic;
 
 using iTextSharp.text;
 using iTextSharp.text.pdf;
 using iTextSharp.tool.xml;
+using iTextSharp.tool.xml.html;
+using iTextSharp.tool.xml.parser;
+using iTextSharp.tool.xml.css;
+using iTextSharp.tool.xml.pipeline.html;
+using iTextSharp.tool.xml.pipeline.end;
+using iTextSharp.tool.xml.pipeline.css;
 
 namespace Html2pdfMVC.Controllers {
-  public class GeraPDF: ActionResult {
+  public class GeraPDF : ActionResult {
     public GeraPDF(object modelo) {
       this.Modelo = modelo;
     }
@@ -40,6 +47,8 @@ namespace Html2pdfMVC.Controllers {
 
     // Nome da view a ser renderizada (default = view da ação)
     public string NomeView { get; set; }
+
+    // Define função para efetuar modificações nas definições do documento
     public Action<PdfWriter, Document> preparaDocumento { get; set; }
 
     // Gera saída http
@@ -84,7 +93,29 @@ namespace Html2pdfMVC.Controllers {
           // Converte o HTML em PDF
           using (StringReader sr = new StringReader(StringHtml(cc))) {
             try {
-              XMLWorkerHelper.GetInstance().ParseXHtml(pw, doc, sr);
+
+              // Versão VahidN (ver classe abaixo)
+              var tagProcessors = (DefaultTagProcessorFactory)Tags.GetHtmlTagProcessorFactory();
+              tagProcessors.RemoveProcessor(HTML.Tag.IMG); // remove the default processor
+              tagProcessors.AddProcessor(HTML.Tag.IMG, new CustomImageTagProcessor()); // use our new processor
+
+              CssFilesImpl cssFiles = new CssFilesImpl();
+              cssFiles.Add(XMLWorkerHelper.GetInstance().GetDefaultCSS());
+              var cssResolver = new StyleAttrCSSResolver(cssFiles);
+              cssResolver.AddCss(@"code { padding: 2px 4px; }", "utf-8", true);
+
+              var charset = Encoding.UTF8;
+              var hpc = new HtmlPipelineContext(new CssAppliersImpl(new XMLWorkerFontProvider()));
+              hpc.SetAcceptUnknown(true).AutoBookmark(true).SetTagFactory(tagProcessors);           // inject the tagProcessors
+
+              var htmlPipeline = new HtmlPipeline(hpc, new PdfWriterPipeline(doc, pw));
+              var pipeline = new CssResolverPipeline(cssResolver, htmlPipeline);
+              var worker = new XMLWorker(pipeline, true);
+              var xmlParser = new XMLParser(true, worker, charset);
+              xmlParser.Parse(sr);
+
+              //XMLWorkerHelper.GetInstance().ParseXHtml(pw, doc, sr);                              // versão simplificada
+
             } catch (Exception ee) {
               cc.HttpContext.Session["Erro"] = ee;
               try {
@@ -134,6 +165,41 @@ namespace Html2pdfMVC.Controllers {
         view.Render(vc, tw);
       }
       return sb.ToString();
+    }
+  }
+
+  /*
+   * Tag de imagem customizada conforme artigo de VahidN em
+   * http://stackoverflow.com/questions/19389999/can-itextsharp-xmlworker-render-embedded-images 
+   */
+  public class CustomImageTagProcessor: iTextSharp.tool.xml.html.Image {
+    public override IList<IElement> End(IWorkerContext ctx, Tag tag, IList<IElement> currentContent) {
+      IDictionary<string, string> attributes = tag.Attributes;
+
+      string src;
+      if (!attributes.TryGetValue(HTML.Attribute.SRC, out src))
+        return new List<IElement>(1);
+
+      if (string.IsNullOrEmpty(src))
+        return new List<IElement>(1);
+
+      // Base64 Image tag
+      if (src.StartsWith("data:image/", StringComparison.InvariantCultureIgnoreCase)) {
+        var base64Data = src.Substring(src.IndexOf(",") + 1);
+        var imagedata = Convert.FromBase64String(base64Data);
+        var image = iTextSharp.text.Image.GetInstance(imagedata);
+
+        var list = new List<IElement>();
+        var htmlPipelineContext = GetHtmlPipelineContext(ctx);
+        list.Add(GetCssAppliers()
+          .Apply(new Chunk((iTextSharp.text.Image)GetCssAppliers()
+          .Apply(image, tag, htmlPipelineContext), 0, 0, true), tag, htmlPipelineContext));
+        return list;
+
+      // Non base64 Image tag
+      } else {
+        return base.End(ctx, tag, currentContent);
+      }
     }
   }
 }
