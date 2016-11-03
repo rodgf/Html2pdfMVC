@@ -18,7 +18,7 @@ A view em questão será a própria view usada para gerar o PDF, não é necess�
 
 **HTML com imagens**
 
-Graças ao artigo de VahidN em [StackOverflow](http://stackoverflow.com/questions/19389999/can-itextsharp-xmlworker-render-embedded-images) é possível incluirem-se imagens no PDF a partir de tags <img> usando conversão para base64. Veja exemplo no projeto.
+Graças ao artigo de VahidN em [StackOverflow](http://stackoverflow.com/questions/19389999/can-itextsharp-xmlworker-render-embedded-images) é possível incluirem-se imagens no PDF a partir de tags &lt;img&gt; usando conversão para base64. Veja exemplo no projeto.
 
 **Projeto de exemplo**
 
