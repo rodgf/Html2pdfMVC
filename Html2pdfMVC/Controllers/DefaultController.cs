@@ -30,6 +30,13 @@ namespace Html2pdfMVC.Controllers {
       return View(modelo);
     }
 
+    // HTML Form
+    public ActionResult Form() {
+      object modelo = (new Random()).Next(100);
+
+      return View(modelo);
+    }
+
     // Gera PDF a partir da view
     [HttpPost]
     public ActionResult gerarPDF() {
@@ -53,6 +60,17 @@ namespace Html2pdfMVC.Controllers {
       return new GeraPDF("ComImagem", modelo, (writer, document) => {
         document.SetPageSize(new Rectangle(850f, 600f, 90));
       });
+    }
+
+    // Gera PDF a partir de formulário
+    [HttpPost]
+    public ActionResult gerarPDFForm() {
+      object modelo = 0;
+
+      if (Request.Form["id"] != null)
+        modelo = int.Parse(Request.Form["id"].ToString());
+
+      return new GeraPDF("Form", modelo);
     }
 
     // Gera PDF com alterações direcionando a download

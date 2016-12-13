@@ -1,0 +1,27 @@
+﻿@{
+  ViewBag.Title = "Index";
+}
+
+<h2>Formulário de entrada de dados - Registro @Html.Raw((int)Model)</h2>
+
+@using (Html.BeginForm("GerarPDFForm", "Default", FormMethod.Post, new { id = "frmPDF", target = "_blank" })) {
+
+  <!-- Formulário -->
+  <table>
+    <tr>
+      <td>
+        Campo
+      </td>
+      <td>
+        <input type="text" id="txCampo" name="campo" value="Algum valor" />
+      </td>
+    </tr>
+  </table>
+
+    <div class="ajeita excluir">
+      <input type="hidden" id="txRel" name="rel" value="Tabelas XPTO" />
+      <input type="hidden" id="txID" name="id" value="@Html.Raw((int)Model)" />
+      <input type="submit" value="Gerar PDF" style="width: 150px" />&nbsp;
+      <input type="button" value="HTML com imagem" onclick="document.location.href='@Url.Content("~/Default/ComImagem")'" style="width: 150px" />
+    </div>
+  }

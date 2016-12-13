@@ -134,6 +134,7 @@
     <Content Include="Scripts\jquery-1.10.2.min.map" />
     <Content Include="Views\Default\Erro.cshtml" />
     <Content Include="Views\Default\ComImagem.cshtml" />
+    <Content Include="Views\Default\Form.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

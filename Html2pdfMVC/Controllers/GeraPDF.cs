@@ -13,6 +13,7 @@ using iTextSharp.tool.xml.css;
 using iTextSharp.tool.xml.pipeline.html;
 using iTextSharp.tool.xml.pipeline.end;
 using iTextSharp.tool.xml.pipeline.css;
+using static iTextSharp.text.Font;
 
 namespace Html2pdfMVC.Controllers {
   public class GeraPDF : ActionResult {
@@ -99,6 +100,9 @@ namespace Html2pdfMVC.Controllers {
               tagProcessors.RemoveProcessor(HTML.Tag.IMG); // remove the default processor
               tagProcessors.AddProcessor(HTML.Tag.IMG, new CustomImageTagProcessor());              // use our new processor
 
+              // Campo texto de formuários
+              tagProcessors.AddProcessor(HTML.Tag.INPUT, new CustomInputTagProcessor());            // (experimental)
+
               CssFilesImpl cssFiles = new CssFilesImpl();
               cssFiles.Add(XMLWorkerHelper.GetInstance().GetDefaultCSS());
               var cssResolver = new StyleAttrCSSResolver(cssFiles);
@@ -172,7 +176,7 @@ namespace Html2pdfMVC.Controllers {
    * Tag de imagem customizada conforme artigo de VahidN em
    * http://stackoverflow.com/questions/19389999/can-itextsharp-xmlworker-render-embedded-images 
    */
-  public class CustomImageTagProcessor: iTextSharp.tool.xml.html.Image {
+  public class CustomImageTagProcessor : iTextSharp.tool.xml.html.Image {
     public override IList<IElement> End(IWorkerContext ctx, Tag tag, IList<IElement> currentContent) {
       IDictionary<string, string> attributes = tag.Attributes;
 
@@ -196,10 +200,48 @@ namespace Html2pdfMVC.Controllers {
           .Apply(image, tag, htmlPipelineContext), 0, 0, true), tag, htmlPipelineContext));
         return list;
 
-      // Non base64 Image tag
+        // Non base64 Image tag
       } else {
         return base.End(ctx, tag, currentContent);
       }
+    }
+  }
+
+  /*
+   * Tag de input text (experimental
+   * 
+   */
+  public class CustomInputTagProcessor : iTextSharp.tool.xml.html.Span {
+    public override IList<IElement> End(IWorkerContext ctx, Tag tag, IList<IElement> currentContent) {
+      IDictionary<string, string> attributes = tag.Attributes;
+      Font fontNormal = new Font(FontFamily.TIMES_ROMAN, 12.0f, Font.NORMAL, BaseColor.BLACK);
+
+      string type;
+      if (!attributes.TryGetValue(HTML.Attribute.TYPE, out type))
+        return new List<IElement>(1);
+      if (!type.ToLower().Equals("text"))
+        return new List<IElement>(1);
+      string value = attributes["value"];
+
+      var chunk = new Chunk(value, fontNormal);
+      var phrase = new Phrase(chunk);
+
+      var list = new List<IElement>();
+      var htmlPipelineContext = GetHtmlPipelineContext(ctx);
+      /*
+      IElement elemento = GetCssAppliers()
+        .Apply(phrase, tag, htmlPipelineContext);
+      list.Add(elemento);
+      */
+
+      try {
+        list.Add(GetCssAppliers().Apply(chunk, tag, htmlPipelineContext));
+
+      } catch (NoCustomContextException e) {
+        throw new Exception("NoCustomContextException (" + e);
+      }
+
+      return list;
     }
   }
 }
