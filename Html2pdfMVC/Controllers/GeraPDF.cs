@@ -13,6 +13,7 @@ using iTextSharp.tool.xml.css;
 using iTextSharp.tool.xml.pipeline.html;
 using iTextSharp.tool.xml.pipeline.end;
 using iTextSharp.tool.xml.pipeline.css;
+
 using static iTextSharp.text.Font;
 
 namespace Html2pdfMVC.Controllers {
@@ -102,6 +103,7 @@ namespace Html2pdfMVC.Controllers {
 
               // Campo texto de formuários
               tagProcessors.AddProcessor(HTML.Tag.INPUT, new CustomInputTagProcessor());            // (experimental)
+              tagProcessors.AddProcessor(HTML.Tag.SELECT, new CustomSelectTagProcessor());          // (experimental)
 
               CssFilesImpl cssFiles = new CssFilesImpl();
               cssFiles.Add(XMLWorkerHelper.GetInstance().GetDefaultCSS());
@@ -208,7 +210,7 @@ namespace Html2pdfMVC.Controllers {
   }
 
   /*
-   * Tag de input text (experimental)
+   * Tag input text (experimental)
    * 
    */
   public class CustomInputTagProcessor : iTextSharp.tool.xml.html.Span {
@@ -221,63 +223,90 @@ namespace Html2pdfMVC.Controllers {
       if (!type.ToLower().Equals("text"))
         return new List<IElement>(1);
 
-      FontFamily familia = FontFamily.TIMES_ROMAN;
-      if (tag.CSS.ContainsKey("font-family")) {
-        if (tag.CSS["font-family"].ToLower().IndexOf("courier") > -1 ||
-          tag.CSS["font-family"].ToLower().IndexOf("lucida") > -1)
-          familia = FontFamily.COURIER;
-        if (tag.CSS["font-family"].ToString().ToLower().IndexOf("helvetica") > -1 ||
-          tag.CSS["font-family"].ToLower().IndexOf("sans") > -1 ||
-          tag.CSS["font-family"].ToLower().IndexOf("arial") > -1 ||
-          tag.CSS["font-family"].ToLower().IndexOf("verdana") > -1 ||
-          tag.CSS["font-family"].ToLower().IndexOf("tahoma") > -1)
-          familia = FontFamily.HELVETICA;
-      }
-
-      float tamanho = 12.0f;
-      if (tag.CSS.ContainsKey("font-size")) {
-        float.TryParse(tag.CSS["font-size"].Replace("px", "").Replace("pt", ""), out tamanho);
-      }
-
-      BaseColor cor = BaseColor.BLACK;
-      if (tag.CSS.ContainsKey("color")) {
-        if (tag.CSS["color"].ToLower().Equals("blue"))
-          cor = BaseColor.BLUE;
-        if (tag.CSS["color"].ToLower().Equals("red"))
-          cor = BaseColor.RED;
-        if (tag.CSS["color"].ToLower().Equals("green"))
-          cor = BaseColor.GREEN;
-      }
-
-      int tipo = Font.NORMAL;
-      if (tag.CSS.ContainsKey("font-weight")) {
-        if (tag.CSS["font-weight"].ToLower().IndexOf("bold") > -1)
-          tipo = Font.BOLD;
-      }
-
-      Font fonte = new Font(familia, tamanho, tipo, cor);
-
+      Font fonte = Funcoes.obtemFonte(tag.CSS);
       string value = attributes["value"];
-
       var chunk = new Chunk(value, fonte);
       var phrase = new Phrase(chunk);
 
       var list = new List<IElement>();
       var htmlPipelineContext = GetHtmlPipelineContext(ctx);
-      /*
-      IElement elemento = GetCssAppliers()
-        .Apply(phrase, tag, htmlPipelineContext);
-      list.Add(elemento);
-      */
-
       try {
         list.Add(GetCssAppliers().Apply(chunk, tag, htmlPipelineContext));
-
       } catch (NoCustomContextException e) {
         throw new Exception("NoCustomContextException (" + e + ").");
       }
 
       return list;
+    }
+  }
+
+  /*
+    * Tag select (experimental)
+    * 
+    */
+  public class CustomSelectTagProcessor : iTextSharp.tool.xml.html.Span {
+    public override IList<IElement> End(IWorkerContext ctx, Tag tag, IList<IElement> currentContent) {
+      IDictionary<string, string> attributes = tag.Attributes;
+
+      Font fonte = Funcoes.obtemFonte(tag.CSS);
+      string value = "";
+      foreach (Tag option in tag.Children) {
+        if (option.Attributes.Keys.Contains("selected"))
+          value = option.ToString();  ///
+      }
+      var chunk = new Chunk(value, fonte);
+      var phrase = new Phrase(chunk);
+
+      var list = new List<IElement>();
+      var htmlPipelineContext = GetHtmlPipelineContext(ctx);
+      try {
+        list.Add(GetCssAppliers().Apply(chunk, tag, htmlPipelineContext));
+      } catch (NoCustomContextException e) {
+        throw new Exception("NoCustomContextException (" + e + ").");
+      }
+
+      return list;
+    }
+  }
+
+  public static class Funcoes {
+    public static Font obtemFonte(IDictionary<string, string> estilo) {
+
+      FontFamily familia = FontFamily.TIMES_ROMAN;
+      if (estilo.ContainsKey("font-family")) {
+        if (estilo["font-family"].ToLower().IndexOf("courier") > -1 ||
+          estilo["font-family"].ToLower().IndexOf("lucida") > -1)
+          familia = FontFamily.COURIER;
+        if (estilo["font-family"].ToString().ToLower().IndexOf("helvetica") > -1 ||
+          estilo["font-family"].ToLower().IndexOf("sans") > -1 ||
+          estilo["font-family"].ToLower().IndexOf("arial") > -1 ||
+          estilo["font-family"].ToLower().IndexOf("verdana") > -1 ||
+          estilo["font-family"].ToLower().IndexOf("tahoma") > -1)
+          familia = FontFamily.HELVETICA;
+      }
+
+      float tamanho = 12.0f;
+      if (estilo.ContainsKey("font-size")) {
+        float.TryParse(estilo["font-size"].Replace("px", "").Replace("pt", ""), out tamanho);
+      }
+
+      BaseColor cor = BaseColor.BLACK;
+      if (estilo.ContainsKey("color")) {
+        if (estilo["color"].ToLower().Equals("blue"))
+          cor = BaseColor.BLUE;
+        if (estilo["color"].ToLower().Equals("red"))
+          cor = BaseColor.RED;
+        if (estilo["color"].ToLower().Equals("green"))
+          cor = BaseColor.GREEN;
+      }
+
+      int tipo = Font.NORMAL;
+      if (estilo.ContainsKey("font-weight")) {
+        if (estilo["font-weight"].ToLower().IndexOf("bold") > -1)
+          tipo = Font.BOLD;
+      }
+
+      return new Font(familia, tamanho, tipo, cor);
     }
   }
 }

@@ -24,6 +24,10 @@ Graças ao artigo de VahidN em [StackOverflow](http://stackoverflow.com/question
 
 ( https://github.com/rodgf/Html2pdfMVC )
 
+**Histórico de versões**
+
+- Versão 1.2: acrescentada funcionalidade para tratamento de tags &lt;input type="text"&gt; (experimental)
+
 **Mais informações**
 
 [iTextXmlWorker docs] ( http://demo.itextsupport.com/xmlworker/itextdoc/flatsite.html )
