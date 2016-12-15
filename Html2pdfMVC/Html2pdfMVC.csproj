@@ -123,6 +123,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Controllers\GeraPDF.cs" />
+    <Compile Include="Models\NGS.cs" />
     <Compile Include="Models\PDFComImagem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

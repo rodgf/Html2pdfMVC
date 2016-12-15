@@ -5,7 +5,9 @@ Este projeto foi inspirado no projeto MvcRazorToPdf de [Andrew Hutchinson](https
 
 Converte uma página razor/html para pdf no navegador usando iText XML Worker (iTextXmlWorker), disponibilizado nas últimas versões da bibliotexa iText/iTextSarp.
 
-O html deve ser composto como um XML válido, ou seja, todas as tags fechadas, etc.
+O html deve ser composto como um XML válido, ou seja, todas as tags fechadas, etc. (*)
+
+(*) A versão 2.0 traz um filtro de validação que evita erros de html mal formatado.
 
 **Utilização em um projeto existente:**
 
@@ -26,7 +28,9 @@ Graças ao artigo de VahidN em [StackOverflow](http://stackoverflow.com/question
 
 **Histórico de versões**
 
-- Versão 1.2: acrescentada funcionalidade para tratamento de tags &lt;input type="text"&gt; (experimental)
+- Versão 2.0:
+	- Acrescentada funcionalidade para tratamento de tags &lt;input type="text"&gt; e &lt;select&gt; (experimental)
+	- conta com um filtro de validação baseado em Html Agility Pack, para evitar erros de html mal formatado
 
 **Mais informações**
 
