@@ -13,6 +13,9 @@ using iTextSharp.tool.xml.css;
 using iTextSharp.tool.xml.pipeline.html;
 using iTextSharp.tool.xml.pipeline.end;
 using iTextSharp.tool.xml.pipeline.css;
+using iTextSharp.tool.xml.pipeline;
+
+using HtmlAgilityPack;
 
 using static iTextSharp.text.Font;
 
@@ -94,7 +97,6 @@ namespace Html2pdfMVC.Controllers {
 
           // Converte o HTML em PDF
           using (StringReader sr = new StringReader(StringHtml(cc))) {
-            try {
 
               // Versão VahidN (ver classe abaixo)
               var tagProcessors = (DefaultTagProcessorFactory)Tags.GetHtmlTagProcessorFactory();
@@ -114,10 +116,18 @@ namespace Html2pdfMVC.Controllers {
               var hpc = new HtmlPipelineContext(new CssAppliersImpl(new XMLWorkerFontProvider()));
               hpc.SetAcceptUnknown(true).AutoBookmark(true).SetTagFactory(tagProcessors);           // inject the tagProcessors
 
+              /*
+              PdfWriterPipeline pdf = new PdfWriterPipeline(doc, pw);
+              CustomPipeline custom = new CustomPipeline(pdf);
+              HtmlPipeline htmlPipeline = new HtmlPipeline(hpc, custom);
+              */
+
               var htmlPipeline = new HtmlPipeline(hpc, new PdfWriterPipeline(doc, pw));
               var pipeline = new CssResolverPipeline(cssResolver, htmlPipeline);
               var worker = new XMLWorker(pipeline, true);
               var xmlParser = new XMLParser(true, worker, charset);
+
+            try {
               xmlParser.Parse(sr);
 
               //XMLWorkerHelper.GetInstance().ParseXHtml(pw, doc, sr);                              // versão simplificada
@@ -157,6 +167,7 @@ namespace Html2pdfMVC.Controllers {
 
     // Prepara o conteúdo HTML e retorna string
     public string StringHtml(ControllerContext cc) {
+      string stResult;
       IView view = ViewEngines.Engines.FindView(cc, NomeView, null).View;
       StringBuilder sb = new StringBuilder();
 
@@ -170,7 +181,60 @@ namespace Html2pdfMVC.Controllers {
           tw);
         view.Render(vc, tw);
       }
-      return sb.ToString();
+      stResult = sb.ToString();
+      stResult = preparaTags(stResult);
+      return stResult;
+    }
+
+    // Prepara tags do Html
+    public string preparaTags(string html) {
+      string stResult = html;
+
+      // Filtra documento
+      StringBuilder sb = new StringBuilder();
+      StringWriter sw = new StringWriter(sb);
+      HtmlDocument had = new HtmlDocument();
+      HtmlNode.ElementsFlags["form"] = HtmlElementFlag.CanOverlap;
+      HtmlNode.ElementsFlags["br"] = HtmlElementFlag.Empty;
+      HtmlNode.ElementsFlags["option"] = HtmlElementFlag.CanOverlap;
+      if (HtmlNode.ElementsFlags.ContainsKey("input")) {
+        HtmlNode.ElementsFlags["input"] = HtmlElementFlag.Closed;
+      } else {
+        HtmlNode.ElementsFlags.Add("input", HtmlElementFlag.Closed);
+      }
+      if (HtmlNode.ElementsFlags.ContainsKey("link")) {
+        HtmlNode.ElementsFlags["link"] = HtmlElementFlag.Closed;
+      } else {
+        HtmlNode.ElementsFlags.Add("link", HtmlElementFlag.Closed);
+      }
+      if (HtmlNode.ElementsFlags.ContainsKey("img")) {
+        HtmlNode.ElementsFlags["img"] = HtmlElementFlag.Closed;
+      } else {
+        HtmlNode.ElementsFlags.Add("img", HtmlElementFlag.Closed);
+      }
+      had.OptionOutputAsXml = false;
+      had.OptionCheckSyntax = true;
+      had.OptionFixNestedTags = true;
+      had.OptionAutoCloseOnEnd = false;
+      had.OptionWriteEmptyNodes = true;
+
+        try {
+        had.LoadHtml(html);
+      } catch (Exception ee) {
+        System.Diagnostics.Debug.WriteLine("Falha ao abrir html para filtragem (" + ee + ").");
+        return html;
+      }
+
+      // Adiciona atributos para tratamento posterior
+      foreach (HtmlNode no in had.DocumentNode.Descendants("option")) {
+        if (no.Attributes.Contains("selected")) {
+          no.SetAttributeValue("data-conteudo", no.InnerText);
+        }
+      }
+
+      had.Save(sw);
+      stResult = sb.ToString();
+      return stResult;
     }
   }
 
@@ -211,7 +275,6 @@ namespace Html2pdfMVC.Controllers {
 
   /*
    * Tag input text (experimental)
-   * 
    */
   public class CustomInputTagProcessor : iTextSharp.tool.xml.html.Span {
     public override IList<IElement> End(IWorkerContext ctx, Tag tag, IList<IElement> currentContent) {
@@ -242,7 +305,6 @@ namespace Html2pdfMVC.Controllers {
 
   /*
     * Tag select (experimental)
-    * 
     */
   public class CustomSelectTagProcessor : iTextSharp.tool.xml.html.Span {
     public override IList<IElement> End(IWorkerContext ctx, Tag tag, IList<IElement> currentContent) {
@@ -251,8 +313,10 @@ namespace Html2pdfMVC.Controllers {
       Font fonte = Funcoes.obtemFonte(tag.CSS);
       string value = "";
       foreach (Tag option in tag.Children) {
-        if (option.Attributes.Keys.Contains("selected"))
-          value = option.ToString();  ///
+        if (option.Attributes.Keys.Contains("selected")) {
+          if (option.Attributes.Keys.Contains("data-conteudo"))
+            value = option.Attributes["data-conteudo"].Trim();
+        }
       }
       var chunk = new Chunk(value, fonte);
       var phrase = new Phrase(chunk);
@@ -269,6 +333,72 @@ namespace Html2pdfMVC.Controllers {
     }
   }
 
+  public class CustomPipeline: AbstractPipeline {
+    private int indent = -1;
+
+    public CustomPipeline(IPipeline next): base(next) {
+    }
+
+    /* (non-Javadoc)
+     * @see com.itextpdf.tool.xml.pipeline.AbstractPipeline#open(com.itextpdf.tool.xml.WorkerContext, com.itextpdf.tool.xml.Tag, com.itextpdf.tool.xml.ProcessObject)
+     */
+    public override IPipeline Open(IWorkerContext context, Tag t, ProcessObject po) {
+      indent++;
+      for (int i = 0; i < indent; i++)
+        System.Diagnostics.Debug.Write("\t");
+      System.Diagnostics.Debug.WriteLine("<" + t.Name + ">");
+
+      return base.Open(context, t, po);
+    }
+
+    /* (non-Javadoc)
+     * @see com.itextpdf.tool.xml.pipeline.AbstractPipeline#close(com.itextpdf.tool.xml.WorkerContext, com.itextpdf.tool.xml.Tag, com.itextpdf.tool.xml.ProcessObject)
+     */
+    public override IPipeline Close(IWorkerContext context, Tag t, ProcessObject po) {
+      for (int i = 0; i < indent; i++)
+        System.Diagnostics.Debug.Write("\t");
+      System.Diagnostics.Debug.WriteLine("</" + t.Name + ">");
+      indent--;
+
+      return base.Close(context, t, po);
+    }
+  }
+
+  /*
+  // Without @WrapToTest annotation, because this test only illustrated custom element handler
+  public class D01_CustomElementHandler {
+    public static String SRC = "resources/xml/walden.html";
+
+    public static void itera() {
+      SampleHandler sh = new SampleHandler() {
+        public void Add(Object w) {
+          if (w.GetType() == typeof(WritableElement)) {
+            List<Element> elements = (List<Element>)((WritableElement)w).Elements();
+            foreach (Element element in elements) {
+              System.Diagnostics.Debug.WriteLine(element.GetType());
+            }
+          }
+        }
+      };
+      XMLWorkerHelper.GetInstance().ParseXHtml(sh, new FileInputStream(SRC), null);
+    }
+  }
+  */
+
+  public class SampleHandler : IElementHandler {
+
+    // Generic list of elements
+    public List<IElement> elements = new List<IElement>();
+
+    // Add the supplied item to the list
+    public void Add(IWritable w) {
+      if (w is WritableElement) {
+        elements.AddRange(((WritableElement)w).Elements());
+      }
+    }
+  }
+
+  //
   public static class Funcoes {
     public static Font obtemFonte(IDictionary<string, string> estilo) {
 
