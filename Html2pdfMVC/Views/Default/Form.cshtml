@@ -3,9 +3,7 @@
 }
 <style>
   #info {
-    border: 2px;
     width: 520px;
-    border-style: inset;
   }
 
   table {
@@ -14,6 +12,7 @@
 
   td {
     padding-left: 3px;
+    font-size: 10pt;
   }
 
   .formBack {
@@ -27,96 +26,106 @@
 
   <!-- Formulário -->
   <div id="info">
-    <table cellpadding="2" cellspacing="0">
+    <table border="1">
       <tr>
-        <td class="formBack" colspan="2"><span id="titForm">Dados Cadastrais</span></td>
-      </tr>
+        <td>
+          <table cellpadding="2" cellspacing="0">
+            <tr>
+              <td class="formBack" colspan="2"><span id="titForm">Dados Cadastrais</span></td>
+            </tr>
 
-      <tr>
-        <td class="formBack" width="100" valign="top"><label for="q0">Nome:</label></td>
-        <td class="formBack"><input type="text" name="q0_Nome" id="q0" value="James Dean" /></td>
-      </tr>
-    </table>
+            <tr>
+              <td class="formBack" colspan="2">&nbsp;</td>
+            </tr>
+            <tr>
+              <td class="formBack" width="100" valign="top"><label for="q0">Nome:</label></td>
+              <td class="formBack"><input type="text" name="q0_Nome" id="q0" value="James Dean" /></td>
+            </tr>
+          </table>
 
-    <table cellpadding="2" cellspacing="0">
-      <tr>
-        <td class="formBack" width="100" valign="top"><label for="q2">Endereço:</label></td>
-        <td class="formBack"><input type="text" name="q2_Endereo" id="q2" value="Alameda das Flores, 1314" /></td>
-      </tr>
-    </table>
+          <table cellpadding="2" cellspacing="0">
+            <tr>
+              <td class="formBack" width="100" valign="top"><label for="q2">Endereço:</label></td>
+              <td class="formBack"><input type="text" name="q2_Endereo" id="q2" value="Alameda das Flores, 1314" /></td>
+            </tr>
+          </table>
 
-    <table cellpadding="2" cellspacing="0">
-      <tr>
-        <td class="formBack" width="100" valign="top"><label for="q1">Telefone:</label></td>
-        <td class="formBack"><input type="text" name="q1_Telefone" id="q1" value="(61) 3562-5656" /></td>
-      </tr>
-    </table>
+          <table cellpadding="2" cellspacing="0">
+            <tr>
+              <td class="formBack" width="100" valign="top"><label for="q1">Telefone:</label></td>
+              <td class="formBack"><input type="text" name="q1_Telefone" id="q1" value="(61) 3562-5656" /></td>
+            </tr>
+          </table>
 
-    <table cellpadding="2" cellspacing="0">
-      <tr>
-        <td class="formBack" width="100" valign="top"><label for="q3">Cidade:</label></td>
-        <td class="formBack"><input type="text" name="q3_Cidade" id="q3" style="width:200px;" value="Brasília" /></td>
-        <td class="formBack" valign="top"><label for="q4">Estado:</label></td>
-        <td class="formBack">
-          <select name="q4_Estado" id="q4">
-            <option></option>
-            <option>
-              AM
-            </option>
-            <option selected>
-              DF
-            </option>
-            <option>
-              PA
-            </option>
-            <option>
-              RJ
-            </option>
-          </select>&nbsp;&nbsp;
+          <table cellpadding="2" cellspacing="0">
+            <tr>
+              <td class="formBack" width="100" valign="top"><label for="q3">Cidade:</label></td>
+              <td class="formBack"><input type="text" name="q3_Cidade" id="q3" style="width:200px;" value="Brasília" /></td>
+              <td class="formBack" valign="top"><label for="q4">Estado:</label></td>
+              <td class="formBack">
+                <select name="q4_Estado" id="q4">
+                  <option></option>
+                  <option>
+                    AM
+                  </option>
+                  <option selected>
+                    DF
+                  </option>
+                  <option>
+                    PA
+                  </option>
+                  <option>
+                    RJ
+                  </option>
+                </select>&nbsp;&nbsp;
+              </td>
+            </tr>
+          </table>
+
+          <table cellpadding="2" cellspacing="0">
+            <tr>
+              <td class="formBack" width="100" valign="top"><label for="q5">País:</label></td>
+
+              <td class="formBack">
+                <select name="q5_Pas" id="q5">
+                  <option></option>
+                  <option>
+                    Bolivia
+                  </option>
+                  <option>
+                    Bosnia &amp; Herzegovina
+                  </option>
+                  <option>
+                    Botswana
+                  </option>
+                  <option selected>
+                    Brazil
+                  </option>
+                  <option>
+                    Bulgaria
+                  </option>
+                  <option>
+                    Burkina Faso
+                  </option>
+                </select>
+              </td>
+            </tr>
+          </table>
+
+          <table cellpadding="2" cellspacing="0">
+            <tr>
+              <td class="formBack" width="100" valign="top"><label for="q6">Comentário:</label></td>
+
+              <td class="formBack">
+                <textarea wrap="soft" name="q6_Comentrio" id="q6"></textarea>
+                <br />&nbsp;
+              </td>
+            </tr>
+          </table>
         </td>
       </tr>
     </table>
-
-    <table cellpadding="2" cellspacing="0">
-      <tr>
-        <td class="formBack" width="100" valign="top"><label for="q5">País:</label></td>
-
-        <td class="formBack">
-          <select name="q5_Pas" id="q5">
-            <option></option>
-            <option>
-              Bolivia
-            </option>
-            <option>
-              Bosnia &amp; Herzegovina
-            </option>
-            <option>
-              Botswana
-            </option>
-            <option selected>
-              Brazil
-            </option>
-            <option>
-              Bulgaria
-            </option>
-            <option>
-              Burkina Faso
-            </option>
-          </select>
-        </td>
-      </tr>
-    </table>
-
-    <table cellpadding="2" cellspacing="0">
-      <tr>
-        <td class="formBack" width="100" valign="top"><label for="q6">Comentário:</label></td>
-
-        <td class="formBack">
-          <textarea wrap="soft" name="q6_Comentrio" id="q6"></textarea>
-          <br />&nbsp;
-        </td>
-      </tr>
-    </table>
+    <br />
   </div>
 
   <div class="ajeita excluir">

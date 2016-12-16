@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using System.IO;
 using System.Text;
 using System.Collections.Generic;
@@ -71,38 +72,57 @@ namespace Html2pdfMVC.Models {
   // Compõe fonte com base em folha de estilo
   public static Font obtemFonte(IDictionary<string, string> estilo) {
 
+      // Família
+      string[] stHelvetica = new string[] { "helvetica", "sans", "serif", "arial", "verdana", "tahoma" };
+      string[] stCourier = new string[] { "courier", "lucida", "monospace" };
       FontFamily familia = FontFamily.TIMES_ROMAN;
       if (estilo.ContainsKey("font-family")) {
-        if (estilo["font-family"].ToLower().IndexOf("courier") > -1 ||
-          estilo["font-family"].ToLower().IndexOf("lucida") > -1)
-          familia = FontFamily.COURIER;
-        if (estilo["font-family"].ToString().ToLower().IndexOf("helvetica") > -1 ||
-          estilo["font-family"].ToLower().IndexOf("sans") > -1 ||
-          estilo["font-family"].ToLower().IndexOf("arial") > -1 ||
-          estilo["font-family"].ToLower().IndexOf("verdana") > -1 ||
-          estilo["font-family"].ToLower().IndexOf("tahoma") > -1)
-          familia = FontFamily.HELVETICA;
+        foreach (string stFonte in stCourier) {
+          if (estilo["font-family"].ToLower().IndexOf(stFonte) > -1)
+            familia = FontFamily.COURIER;
+        }
+        foreach (string stFonte in stHelvetica) {
+          if (estilo["font-family"].ToString().ToLower().IndexOf(stFonte) > -1)
+            familia = FontFamily.HELVETICA;
+        }
       }
 
+      // Tamanho
       float tamanho = 12.0f;
       if (estilo.ContainsKey("font-size")) {
         float.TryParse(estilo["font-size"].Replace("px", "").Replace("pt", ""), out tamanho);
       }
 
+      // Cor
       BaseColor cor = BaseColor.BLACK;
-      if (estilo.ContainsKey("color")) {
-        if (estilo["color"].ToLower().Equals("blue"))
-          cor = BaseColor.BLUE;
-        if (estilo["color"].ToLower().Equals("red"))
-          cor = BaseColor.RED;
-        if (estilo["color"].ToLower().Equals("green"))
-          cor = BaseColor.GREEN;
+      foreach (PropertyInfo pi in typeof(BaseColor).GetProperties()) {
+        if (pi.GetType() == typeof(BaseColor)) {
+          if (estilo["color"].ToLower().Equals(pi.GetValue(null).ToString()))
+            cor = (BaseColor)pi.GetValue(null);
+        }
       }
 
+      // Estilo
       int tipo = Font.NORMAL;
+      List<int> tipos = new List<int>();
       if (estilo.ContainsKey("font-weight")) {
         if (estilo["font-weight"].ToLower().IndexOf("bold") > -1)
+          tipos.Add(Font.BOLD);
+      }
+      if (estilo.ContainsKey("font-style")) {
+        if (estilo["font-style"].ToLower().IndexOf("italic") > -1 || estilo["font-style"].ToLower().IndexOf("oblique") > -1)
+          tipos.Add(Font.ITALIC);
+      }
+      if (tipos.Contains(Font.ITALIC) && tipos.Contains(Font.BOLD)) {
+        tipo = Font.BOLDITALIC;
+      } else {
+        if (tipos.Contains(Font.BOLD)) {
           tipo = Font.BOLD;
+        } else {
+          if (tipos.Contains(Font.ITALIC)) {
+            tipo = Font.ITALIC;
+          }
+        }
       }
 
       return new Font(familia, tamanho, tipo, cor);
