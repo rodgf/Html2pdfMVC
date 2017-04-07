@@ -31,6 +31,11 @@ Graças ao artigo de VahidN em [StackOverflow](http://stackoverflow.com/question
 - Versão 2.0:
 	- Acrescentada funcionalidade para tratamento de tags &lt;input type="text"&gt; e &lt;select&gt; (experimental)
 	- conta com um filtro de validação baseado em Html Agility Pack, para evitar erros de html mal formatado
+	
+**Créditos**
+
+- Andrew Hutchinson - [MvcRazorToPdf](https://github.com/andyhutch77/MvcRazorToPdf)
+- StackOverflow - [Can itextsharp.xmlworker render embedded images?](http://stackoverflow.com/questions/19389999/can-itextsharp-xmlworker-render-embedded-images)
 
 **Mais informações**
 
