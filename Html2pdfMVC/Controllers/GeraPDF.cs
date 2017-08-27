@@ -18,12 +18,19 @@ using static Html2pdfMVC.Models.NGS;
 
 namespace Html2pdfMVC.Controllers {
   public class GeraPDF : ActionResult {
+    string[] css;
+
     public GeraPDF(object modelo) {
       this.Modelo = modelo;
     }
     public GeraPDF(string nomeView, object modelo) {
       NomeView = nomeView;
       this.Modelo = modelo;
+    }
+    public GeraPDF(string nomeView, object modelo, string[] css) {
+      NomeView = nomeView;
+      this.Modelo = modelo;
+      this.css = css;
     }
     public GeraPDF(object modelo, Action<PdfWriter, Document> acao) {
       if (acao == null)
@@ -77,6 +84,7 @@ namespace Html2pdfMVC.Controllers {
 
     // Compõe o documento PDF
     public byte[] GeraDocumento(ControllerContext contextoC) {
+      StyleAttrCSSResolver cssResolver;
 
       contextoC.Controller.ViewData.Model = Modelo;
 
@@ -108,7 +116,7 @@ namespace Html2pdfMVC.Controllers {
             // Folhas de estilo
             CssFilesImpl cssFiles = new CssFilesImpl();
             cssFiles.Add(XMLWorkerHelper.GetInstance().GetDefaultCSS());
-            var cssResolver = new StyleAttrCSSResolver(cssFiles);
+            cssResolver = new StyleAttrCSSResolver(cssFiles);
             cssResolver.AddCss(@"code { padding: 2px 4px; }", "utf-8", true);
 
             var charset = Encoding.UTF8;
@@ -118,6 +126,12 @@ namespace Html2pdfMVC.Controllers {
             // Prepara o parser
             var htmlPipeline = new HtmlPipeline(hpc, new PdfWriterPipeline(doc, pw));
             var pipeline = new CssResolverPipeline(cssResolver, htmlPipeline);
+
+            if (this.css != null) {
+              foreach (string cf in this.css)
+                cssResolver.AddCssFile(cf, true);
+            }
+
             var worker = new XMLWorker(pipeline, true);
             var xmlParser = new XMLParser(true, worker, charset);
             try {
@@ -225,6 +239,30 @@ namespace Html2pdfMVC.Controllers {
           return new List<IElement>(1);
         if (!type.ToLower().Equals("text"))
           return new List<IElement>(1);
+
+        Font fonte = obtemFonte(tag.CSS);
+        string value = attributes["value"];
+        var chunk = new Chunk(value, fonte);
+        var phrase = new Phrase(chunk);
+
+        var list = new List<IElement>();
+        var htmlPipelineContext = GetHtmlPipelineContext(ctx);
+        try {
+          list.Add(GetCssAppliers().Apply(chunk, tag, htmlPipelineContext));
+        } catch (NoCustomContextException e) {
+          throw new Exception("NoCustomContextException (" + e + ").");
+        }
+
+        return list;
+      }
+    }
+
+    /*
+     * Tag textarea text (experimental)
+     */
+    public class CustomTextareaTagProcessor : iTextSharp.tool.xml.html.Span {
+      public override IList<IElement> End(IWorkerContext ctx, Tag tag, IList<IElement> currentContent) {
+        IDictionary<string, string> attributes = tag.Attributes;
 
         Font fonte = obtemFonte(tag.CSS);
         string value = attributes["value"];

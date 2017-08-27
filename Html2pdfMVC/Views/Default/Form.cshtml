@@ -20,9 +20,10 @@
     background: #FFD;
   }
 </style>
-<h2>Formulário de entrada de dados - Registro @Html.Raw((int)Model)</h2>
+<h2>Formulário de entrada de dados - Registro</h2>
 
-@using (Html.BeginForm("GerarPDFForm", "Default", FormMethod.Post, new { id = "frmPDF", target = "_blank" })) {
+@using (Html.BeginForm("Form", "Default", FormMethod.Post, new { id = "frmPDF", target = "_blank" })) {
+@model Html2pdfMVC.Models.FormV
 
   <!-- Formulário -->
   <div id="info">
@@ -39,28 +40,28 @@
             </tr>
             <tr>
               <td class="formBack" width="100" valign="top"><label for="q0">Nome:</label></td>
-              <td class="formBack"><input type="text" name="q0_Nome" id="q0" value="James Dean" /></td>
+              <td class="formBack"><input type="text" name="q0_Nome" id="q0" value="@Model.form.Nome" /></td>
             </tr>
           </table>
 
           <table cellpadding="2" cellspacing="0">
             <tr>
               <td class="formBack" width="100" valign="top"><label for="q2">Endereço:</label></td>
-              <td class="formBack"><input type="text" name="q2_Endereo" id="q2" value="Alameda das Flores, 1314" /></td>
+              <td class="formBack"><input type="text" name="q2_Endereo" id="q2" value="@Model.form.Endereco" /></td>
             </tr>
           </table>
 
           <table cellpadding="2" cellspacing="0">
             <tr>
               <td class="formBack" width="100" valign="top"><label for="q1">Telefone:</label></td>
-              <td class="formBack"><input type="text" name="q1_Telefone" id="q1" value="(61) 3562-5656" /></td>
+              <td class="formBack"><input type="text" name="q1_Telefone" id="q1" value="@Model.form.Telefone" /></td>
             </tr>
           </table>
 
           <table cellpadding="2" cellspacing="0">
             <tr>
               <td class="formBack" width="100" valign="top"><label for="q3">Cidade:</label></td>
-              <td class="formBack"><input type="text" name="q3_Cidade" id="q3" style="width:200px;" value="Brasília" /></td>
+              <td class="formBack"><input type="text" name="q3_Cidade" id="q3" style="width:200px;" value="@Model.form.Cidade" /></td>
               <td class="formBack" valign="top"><label for="q4">Estado:</label></td>
               <td class="formBack">
                 <select name="q4_Estado" id="q4">
@@ -68,7 +69,11 @@
                   <option>
                     AM
                   </option>
-                  <option selected>
+                  <option @{
+                      if (Model.form.Estado == "DF") {
+                        @Html.Raw(" selected=\"selected\" ");
+                      }
+                    }>
                     DF
                   </option>
                   <option>
@@ -98,26 +103,37 @@
                   <option>
                     Botswana
                   </option>
-                  <option selected>
+                  <option @{ if (Model.form.Pais == "Brazil") { @Html.Raw(" selected=\"selected\" ") ; } }>
                     Brazil
                   </option>
-                  <option>
-                    Bulgaria
-                  </option>
-                  <option>
-                    Burkina Faso
-                  </option>
-                </select>
-              </td>
-            </tr>
-          </table>
 
-          <table cellpadding="2" cellspacing="0">
-            <tr>
-              <td class="formBack" width="100" valign="top"><label for="q6">Comentário:</label></td>
+
+  
+                    <option>
+                      Bulgaria
+                    </option>
+  
+                    <option>
+                      Burkina Faso
+                    </option>
+  
+                  </select>
+  
+                </td>
+  
+              </tr>
+  
+            </table>
+  
+
+            <table cellpadding="2" cellspacing="0">
+  
+              <tr>
+  
+                <td class="formBack" width="100" valign="top"><label for="q6">Comentário:</label></td>
 
               <td class="formBack">
-                <textarea wrap="soft" name="q6_Comentrio" id="q6"></textarea>
+                <textarea wrap="soft" name="q6_Comentrio" id="q6">@Model.form.Comentario</textarea>
                 <br />&nbsp;
               </td>
             </tr>
@@ -129,8 +145,7 @@
   </div>
 
   <div class="ajeita excluir">
-    <input type="hidden" id="txRel" name="rel" value="Tabelas XPTO" />
-    <input type="hidden" id="txID" name="id" value="@Html.Raw((int)Model)" />
+    <input type="hidden" id="hdDestino" name="destino" value="PDF" />
     <input type="submit" value="Gerar PDF" style="width: 150px" />&nbsp;
     <input type="button" value="Tabelas" onclick="document.location.href='@Url.Content("~/Default/Index")'" style="width: 150px" />
     <input type="button" value="HTML com imagem" onclick="document.location.href='@Url.Content("~/Default/ComImagem")'" style="width: 150px" />
