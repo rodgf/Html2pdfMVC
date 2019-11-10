@@ -1,76 +1,73 @@
-﻿using System;
-using System.Reflection;
-using System.IO;
-using System.Text;
-using System.Collections.Generic;
-
-using HtmlAgilityPack;
-
+﻿using HtmlAgilityPack;
 using iTextSharp.text;
-
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
+using System.Text;
 using static iTextSharp.text.Font;
 
 namespace Html2pdfMVC.Models {
   public class NGS {
 
-  // Prepara Html
-  public static string preparaHtml(string html) {
-    string stResult = html;
+    // Prepara Html
+    public static string preparaHtml(string html) {
+      string stResult = html;
 
-    // Filtra documento
-    StringBuilder sb = new StringBuilder();
-    StringWriter sw = new StringWriter(sb);
-    HtmlDocument had = new HtmlDocument();
-    
-    // Comportamento de tags específicas
-    HtmlNode.ElementsFlags["form"] = HtmlElementFlag.CanOverlap;
-    HtmlNode.ElementsFlags["br"] = HtmlElementFlag.Empty;
-    HtmlNode.ElementsFlags["option"] = HtmlElementFlag.CanOverlap;
-    if (HtmlNode.ElementsFlags.ContainsKey("input")) {
-      HtmlNode.ElementsFlags["input"] = HtmlElementFlag.Closed;
-    } else {
-      HtmlNode.ElementsFlags.Add("input", HtmlElementFlag.Closed);
-    }
-    if (HtmlNode.ElementsFlags.ContainsKey("link")) {
-      HtmlNode.ElementsFlags["link"] = HtmlElementFlag.Closed;
-    } else {
-      HtmlNode.ElementsFlags.Add("link", HtmlElementFlag.Closed);
-    }
-    if (HtmlNode.ElementsFlags.ContainsKey("img")) {
-      HtmlNode.ElementsFlags["img"] = HtmlElementFlag.Closed;
-    } else {
-      HtmlNode.ElementsFlags.Add("img", HtmlElementFlag.Closed);
-    }
+      // Filtra documento
+      StringBuilder sb = new StringBuilder();
+      StringWriter sw = new StringWriter(sb);
+      HtmlDocument had = new HtmlDocument();
 
-    // Configurações
-    had.OptionOutputAsXml = false;
-    had.OptionCheckSyntax = true;
-    had.OptionFixNestedTags = true;
-    had.OptionAutoCloseOnEnd = false;
-    had.OptionWriteEmptyNodes = true;
-
-    // Tratamento
-    try {
-      had.LoadHtml(html);
-    } catch (Exception ee) {
-      System.Diagnostics.Debug.WriteLine("Falha ao abrir html para filtragem (" + ee + ").");
-      return html;
-    }
-
-    // Adiciona atributos para tratamento posterior
-    foreach (HtmlNode no in had.DocumentNode.Descendants("option")) {
-      if (no.Attributes.Contains("selected")) {
-        no.SetAttributeValue("data-conteudo", no.InnerText);
+      // Comportamento de tags específicas
+      HtmlNode.ElementsFlags["form"] = HtmlElementFlag.CanOverlap;
+      HtmlNode.ElementsFlags["br"] = HtmlElementFlag.Empty;
+      HtmlNode.ElementsFlags["option"] = HtmlElementFlag.CanOverlap;
+      if (HtmlNode.ElementsFlags.ContainsKey("input")) {
+        HtmlNode.ElementsFlags["input"] = HtmlElementFlag.Closed;
+      } else {
+        HtmlNode.ElementsFlags.Add("input", HtmlElementFlag.Closed);
       }
+      if (HtmlNode.ElementsFlags.ContainsKey("link")) {
+        HtmlNode.ElementsFlags["link"] = HtmlElementFlag.Closed;
+      } else {
+        HtmlNode.ElementsFlags.Add("link", HtmlElementFlag.Closed);
+      }
+      if (HtmlNode.ElementsFlags.ContainsKey("img")) {
+        HtmlNode.ElementsFlags["img"] = HtmlElementFlag.Closed;
+      } else {
+        HtmlNode.ElementsFlags.Add("img", HtmlElementFlag.Closed);
+      }
+
+      // Configurações
+      had.OptionOutputAsXml = false;
+      had.OptionCheckSyntax = true;
+      had.OptionFixNestedTags = true;
+      had.OptionAutoCloseOnEnd = false;
+      had.OptionWriteEmptyNodes = true;
+
+      // Tratamento
+      try {
+        had.LoadHtml(html);
+      } catch (Exception ee) {
+        System.Diagnostics.Debug.WriteLine("Falha ao abrir html para filtragem (" + ee + ").");
+        return html;
+      }
+
+      // Adiciona atributos para tratamento posterior
+      foreach (HtmlNode no in had.DocumentNode.Descendants("option")) {
+        if (no.Attributes.Contains("selected")) {
+          no.SetAttributeValue("data-conteudo", no.InnerText);
+        }
+      }
+
+      had.Save(sw);
+      stResult = sb.ToString();
+      return stResult;
     }
 
-    had.Save(sw);
-    stResult = sb.ToString();
-    return stResult;
-  }
-
-  // Compõe fonte com base em folha de estilo
-  public static Font obtemFonte(IDictionary<string, string> estilo) {
+    // Compõe fonte com base em folha de estilo
+    public static Font obtemFonte(IDictionary<string, string> estilo) {
 
       // Família
       string[] stHelvetica = new string[] { "helvetica", "sans", "serif", "arial", "verdana", "tahoma" };

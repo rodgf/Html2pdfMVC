@@ -1,24 +1,37 @@
-﻿using System;
+﻿using iTextSharp.text;
+using iTextSharp.text.pdf;
+using iTextSharp.tool.xml;
+using iTextSharp.tool.xml.css;
+using iTextSharp.tool.xml.html;
+using iTextSharp.tool.xml.parser;
+using iTextSharp.tool.xml.pipeline.css;
+using iTextSharp.tool.xml.pipeline.end;
+using iTextSharp.tool.xml.pipeline.html;
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Web.Mvc;
-using System.Collections.Generic;
-
-using iTextSharp.text;
-using iTextSharp.text.pdf;
-using iTextSharp.tool.xml;
-using iTextSharp.tool.xml.html;
-using iTextSharp.tool.xml.parser;
-using iTextSharp.tool.xml.css;
-using iTextSharp.tool.xml.pipeline.html;
-using iTextSharp.tool.xml.pipeline.end;
-using iTextSharp.tool.xml.pipeline.css;
-
 using static Html2pdfMVC.Models.NGS;
 
-namespace Html2pdfMVC.Controllers {
+namespace Html2pdfMVC.Helpers {
+
+  // Exempos de conversão
   public class GeraPDF : ActionResult {
-    string[] css;
+    private string[] css;
+
+    // Dados do registro para saída
+    public object Modelo { get; set; }
+
+    // Definição de arquivo para download
+    public string Download { get; set; }
+
+    // Nome da view a ser renderizada (default = view da ação)
+    public string NomeView { get; set; }
+
+    // Define função para efetuar modificações nas definições do documento
+    public Action<PdfWriter, Document> preparaDocumento { get; set; }
+
 
     public GeraPDF(object modelo) {
       this.Modelo = modelo;
@@ -48,17 +61,6 @@ namespace Html2pdfMVC.Controllers {
       this.preparaDocumento = acao;
     }
 
-    // Dados do registro para saída
-    public object Modelo { get; set; }
-
-    // Definição de arquivo para download
-    public string Download { get; set; }
-
-    // Nome da view a ser renderizada (default = view da ação)
-    public string NomeView { get; set; }
-
-    // Define função para efetuar modificações nas definições do documento
-    public Action<PdfWriter, Document> preparaDocumento { get; set; }
 
     // Gera saída http
     public override void ExecuteResult(ControllerContext contextoC) {

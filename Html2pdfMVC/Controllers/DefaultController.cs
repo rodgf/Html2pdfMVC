@@ -1,9 +1,8 @@
-﻿using System;
-using System.Web.Mvc;
-
-using iTextSharp.text;
-
+﻿using Html2pdfMVC.Helpers;
 using Html2pdfMVC.Models;
+using iTextSharp.text;
+using System;
+using System.Web.Mvc;
 
 namespace Html2pdfMVC.Controllers {
   public class DefaultController : Controller {
@@ -76,9 +75,9 @@ namespace Html2pdfMVC.Controllers {
         modelo = int.Parse(Request.Form["id"].ToString());
 
       return new GeraPDF(modelo, (writer, document) => {
-        document.SetPageSize(new Rectangle(500f, 500f, 90));
-        document.NewPage();
-      }) {
+            document.SetPageSize(new Rectangle(500f, 500f, 90));
+            document.NewPage();
+          }) {
         Download = "Saida.pdf"
       };
     }
