@@ -46,3 +46,9 @@ steps:
     cleanContents: false
     preservePaths: false
     trustSSL: false
+
+- task: FileTransform@2
+  inputs:
+    folderPath: '$(System.DefaultWorkingDirectory)/**/*.zip'
+    xmlTargetFiles: 'Web.config'
+    
