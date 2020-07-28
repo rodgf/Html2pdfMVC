@@ -33,20 +33,6 @@ steps:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
 
-- task: FtpUpload@2
-  inputs:
-    credentialsOption: 'inputs'
-    serverUrl: 'ftp://ftp.valiverde.info'
-    username: 'valiverd'
-    password: 'eu12345'
-    rootDirectory: '$(build.artifactStagingDirectory)'
-    filePatterns: '**'
-    remoteDirectory: '/public_ftp/Html2PDF/'
-    clean: false
-    cleanContents: false
-    preservePaths: false
-    trustSSL: false
-
 - task: PowerShell@2
   inputs:
     targetType: 'inline'
@@ -65,4 +51,18 @@ steps:
     tokenSuffix: '}'
     useLegacyPattern: false
     enableTelemetry: true
+    
+- task: FtpUpload@2
+  inputs:
+    credentialsOption: 'inputs'
+    serverUrl: 'ftp://ftp.valiverde.info'
+    username: 'valiverd'
+    password: 'eu12345'
+    rootDirectory: '$(build.artifactStagingDirectory)'
+    filePatterns: '**'
+    remoteDirectory: '/public_ftp/Html2PDF/'
+    clean: false
+    cleanContents: false
+    preservePaths: false
+    trustSSL: false
     
