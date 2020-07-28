@@ -51,7 +51,7 @@ steps:
   inputs:
     targetType: 'inline'
     script: |
-      Write-Host "##vso[task.setvariable variable=customErrorsMode;]$(customErrorsMode)"
+      Write-Host "##vso[task.setvariable variable=customErrorsMode]$customErrorsMode"
 
 - task: replacetokens@3
   inputs:
