@@ -47,6 +47,12 @@ steps:
     preservePaths: false
     trustSSL: false
 
+- task: PowerShell@2
+  inputs:
+    targetType: 'inline'
+    script: |
+      Write-Host "##vso[task.setvariable variable=customErrorsMode;]$(customErrorsMode)"
+
 - task: replacetokens@3
   inputs:
     rootDirectory: '$(System.DefaultWorkingDirectory)'
