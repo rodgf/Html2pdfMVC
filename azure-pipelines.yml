@@ -47,7 +47,16 @@ steps:
     preservePaths: false
     trustSSL: false
 
-- task: FileTransform@2
+- task: replacetokens@3
   inputs:
-    folderPath: '$(System.DefaultWorkingDirectory)'
-    xmlTargetFiles: 'Web.config'
+    rootDirectory: '$(System.DefaultWorkingDirectory)'
+    targetFiles: '**/*.config'
+    encoding: 'auto'
+    writeBOM: true
+    actionOnMissing: 'warn'
+    keepToken: false
+    tokenPrefix: '#{'
+    tokenSuffix: '}'
+    useLegacyPattern: false
+    enableTelemetry: true
+    
